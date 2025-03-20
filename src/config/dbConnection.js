@@ -6,10 +6,10 @@ module.exports = () =>
 	{
 		  return mysql.createConnection(
 		  {
-				host: 'mysql-nefelibata02.alwaysdata.net ',
-				user: '396758_andrea',
-				password: 'andreabase?',
-				database: 'nefelibata02_cafe'
+				host: 'iasanz.synology.me',
+				user: 'alumno',
+				password: 'AlumnoSanz$1',
+				database: 'amartinezm396_cafe'
 		  });
 	}
 
