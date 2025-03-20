@@ -70,7 +70,7 @@ app.set('view engine', 'ejs');
 // indicamos la carpeta donde vamos a tener las "vistas"
 //******************************************************************
 
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname,'src', 'views'));
 
 //******************************************************************
 // configuraciones 
@@ -93,7 +93,8 @@ app.use(fileUpload());
 // le indicamos donde está la carpeta de ficheros estáticos (hojas de estilo, imágenes, etc.
 //******************************************************************
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src', 'public')));
+
 
 //******************************************************************
 // configuraciones 
