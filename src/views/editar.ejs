@@ -1,0 +1,59 @@
+<form action="/editar" method="POST">
+    <input type="hidden" name="id" value="<%= id %>"> <!-- Campo oculto para el ID -->
+    
+    <div class="card" style="width: 100%; max-width: 450px; margin: 20px auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="card-body" style="padding: 20px;">
+            <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 20px;">Editar Información</h5>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="nombre" style="font-size: 1rem; color: #555;">Nombre</label>
+                <input type="text" name="nombre" id="nombre" value="<%= nombre %>" required 
+                    style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="apellidos" style="font-size: 1rem; color: #555;">Apellidos</label>
+                <input type="text" name="apellidos" id="apellidos" value="<%= apellidos %>" required
+                    style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="username" style="font-size: 1rem; color: #555;">Username</label>
+                <input type="text" name="username" id="username" value="<%= username %>" required 
+                    style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="email" style="font-size: 1rem; color: #555;">Email</label>
+                <input type="email" name="email" id="email" value="<%= email %>" required 
+                    style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="telefono" style="font-size: 1rem; color: #555;">Teléfono</label>
+                <input type="text" name="telefono" id="telefono" value="<%= telefono %>" required 
+                    style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+            </div>
+        </div>
+
+        <div class="card-body" style="display: flex; justify-content: space-between; padding: 20px 20px 10px;">
+            <button type="submit" class="boton" 
+                style="background-color: #28a745; color: white; padding: 10px 15px; font-size: 1rem; border: none; border-radius: 5px; cursor: pointer;  transition: background-color 0.3s;">
+                Guardar
+            </button>
+            
+            <button type="button" class="boton" id="cancelar"
+                style="background-color: #dc3545; color: white; padding: 10px 15px; font-size: 1rem; border: none; border-radius: 5px; cursor: pointer;  transition: background-color 0.3s;">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById('cancelar').addEventListener('click', function() {
+        if (confirm("¿Estás segura de que quieres cancelar los cambios?")) {
+            window.location.href = "/user";
+        }
+    });
+</script>

@@ -1,0 +1,44 @@
+<section id="user" class="section active">
+    <div class="card" style="width: 18rem; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <img class="card-img-top" src="imagenes/user.webp" alt="Card image cap" style="border-bottom: 2px solid #e3e3e3;">
+        <div class="card-body" style="padding: 20px;">
+            <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 10px;">
+                <%= username %>
+            </h5>
+            <p class="card-text" style="font-size: 1rem; color: #555; margin-bottom: 10px;">
+                <%= nombre %>
+            </p>
+        </div>
+        <ul class="list-group list-group-flush" style="padding: 0; margin: 0;">
+            <li class="list-group-item" style="border-top: 1px solid #f1f1f1; font-size: 1rem; color: #666; padding: 12px;">
+                <strong>Apellidos:</strong> <%= apellidos %>
+            </li>
+            <li class="list-group-item" style="border-top: 1px solid #f1f1f1; font-size: 1rem; color: #666; padding: 12px;">
+                <strong>Email:</strong> <%= email %>
+            </li>
+            <li class="list-group-item" style="border-top: 1px solid #f1f1f1; font-size: 1rem; color: #666; padding: 12px;">
+                <strong>Teléfono:</strong> <%= telefono %>
+            </li>
+        </ul>
+        <input type="hidden" id="userId" value="<%= id %>">
+        <div class="card-body" style="display: flex; justify-content: space-between; padding: 20px 20px 10px;">
+            <button class="boton" onclick="editarUsuario()" 
+                style="background-color: #007bff; color: white; padding: 10px 15px;  border: none; border-radius: 5px; cursor: pointer;  transition: background-color 0.3s;">
+                Editar
+            </button>
+            <button onclick="window.location.href='/logout'" class="boton" 
+   			style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+   			Logout
+			</button>
+
+
+        </div>
+    </div>
+</section>
+
+<script>
+    function editarUsuario() {
+        var userId = document.getElementById("userId").value;
+        window.location.href = "/editar/" + userId;
+    }
+</script>

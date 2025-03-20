@@ -1,0 +1,15 @@
+<section id="achievements" class="section active">
+  <h2 class="section-title">🏆 Tus Logros</h2>
+  <div class="achievements-grid">
+      <% logros.forEach(logro => { %>
+      <div class="achievement-card">
+          <img class="achievement-img" src="imagenes/latte.png" alt="<%= logro.nombre %>">
+          <div class="achievement-content">
+              <h3 class="achievement-title"><%= logro.nombre %></h3>
+              <p class="achievement-description"><%= logro.descripcion %></p>
+              <span class="achievement-reward">🎁 <%= logro.recompensa %></span>
+          </div>
+      </div>
+      <% }); %>
+  </div>
+</section>

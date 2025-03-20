@@ -1,0 +1,37 @@
+<section id="comida" class="section active">
+    <h1 style="text-align: center;">MENÚ</h1>
+    <div id="menu-container" class="menu-container">
+        <% productos.forEach(producto => { %>
+            <div class="menu-card">
+                <img src="imagenes/productos/<%= producto.id %>.jpg" alt="<%= producto.nombre %>">
+                <div class="card-content">
+                    <h3 class="card-title"><%= producto.nombre %></h3>
+                    <p class="card-description"><%= producto.descripcion %></p>
+                    <p class="card-price"><%= producto.precio %>€</p>
+                </div>
+                <button class="boton" onclick="agregarAlCarrito(<%= producto.id %>)">Añadir</button>
+            </div>
+        <% }); %>
+    </div>
+</section>
+
+<script>
+async function agregarAlCarrito(productoId) {
+    try {
+        const response = await fetch('/mascarrito', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ producto_id: productoId })
+        });
+
+        const data = await response.json();
+
+       
+    } catch (error) {
+        console.error("Error al agregar producto:", error);
+    }
+}
+</script>
+	

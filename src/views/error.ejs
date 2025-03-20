@@ -1,0 +1,13 @@
+<section id="error" class="section active">
+    <h1 style="text-align: center;">¡Oops! Página no encontrada</h1>
+    <div class="error-container" style="text-align: center;">
+        <img src="imagenes/error.png" alt="Error 404" style="max-width: 300px;">
+        <div class="error-content">
+            <h3 class="error-title">Algo ha salido mal vuelva a intentarlo</h3>
+            <p class="error-description">
+                <%= errorMessage ? errorMessage : "La página que buscas no existe o ha sido movida. Por favor, verifica la URL o regresa al inicio." %>
+            </p>
+            <a href="/" class="boton">Volver al inicio</a>
+        </div>
+    </div>
+</section>

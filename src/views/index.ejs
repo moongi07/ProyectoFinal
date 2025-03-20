@@ -1,0 +1,129 @@
+<section id="home" class="section active">
+    <div id="content">
+        <div class="logo">
+            <div class="logotext">Café <b>entre</b> líneas</div>
+            <div class="sublogo">Tu portal a libros, música y logros mientras disfrutas tu café.</div>
+            <div class="carousel">
+                <button class="carousel-btn prev">&lt;</button>
+                <div class="carousel-track-container">
+                    <ul class="carousel-track">
+                        <li class="carousel-slide">
+                            <div id="lottie-container-1" onclick="location.href=('/menu');" style="width: 300px; height: 300px;"></div>
+                            <p>Menú</p>
+                        </li>
+                        <li class="carousel-slide">
+                            <div id="lottie-container-3" onclick="location.href=('/focus');"  style="width: 300px; height: 300px;"></div>
+                            <p>Focus</p>
+                        </li>
+                        <li class="carousel-slide">
+                            <div id="lottie-container-4" onclick="location.href=('/logros');"  style="width: 300px; height: 300px;"></div>
+                            <p>Logros</p>
+                        </li>
+                    </ul>
+                </div>
+                <button class="carousel-btn next">&gt;</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+	      // Lottie animations loading function
+function cargarAnimaciones() {
+    lottie.loadAnimation({
+        container: document.getElementById('lottie-container-1'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'animaciones/menu.json'
+    });
+
+    lottie.loadAnimation({
+        container: document.getElementById('lottie-container-3'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'animaciones/music.json'
+    });
+
+    lottie.loadAnimation({
+        container: document.getElementById('lottie-container-4'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'animaciones/achievements.json'
+    });
+}
+
+// Llamar a la función para cargar las animaciones
+cargarAnimaciones();
+
+function setupCarousel(trackSelector, nextButtonSelector, prevButtonSelector) {
+    const track = document.querySelector(trackSelector);
+    const slides = Array.from(track.children);
+    const nextButton = document.querySelector(nextButtonSelector);
+    const prevButton = document.querySelector(prevButtonSelector);
+    let currentIndex = 0;
+
+    function updateSlidePosition() {
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+    }
+
+    // Botones de navegación
+    nextButton.addEventListener('click', () => {
+        if (currentIndex < slides.length - 1) {
+            currentIndex++;
+        } else {
+            currentIndex = 0;
+        }
+        updateSlidePosition();
+    });
+
+    prevButton.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+        } else {
+            currentIndex = slides.length - 1;
+        }
+        updateSlidePosition();
+    });
+
+    // Manejadores de eventos para el deslizado en móvil
+    let startX;
+    track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    track.addEventListener('touchmove', (e) => {
+        const moveX = e.touches[0].clientX;
+        const diff = startX - moveX;
+
+        if (diff > 50) {
+            if (currentIndex < slides.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlidePosition();
+        } else if (diff < -50) {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = slides.length - 1;
+            }
+            updateSlidePosition();
+        }
+    });
+
+    window.addEventListener('resize', updateSlidePosition);
+}
+
+
+setupCarousel('.carousel-track', '.carousel-btn.next', '.carousel-btn.prev');
+
+</script>
+
+
+

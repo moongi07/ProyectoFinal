@@ -1,0 +1,70 @@
+<section id="registro" class="section active" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div class="card" style="width: 320px; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+        <% if (mensaje) { %>
+            <div style="background-color: #ffcccc; color: #cc0000; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 10px;">
+                <p style="margin: 0;"><%= mensaje %></p>
+            </div>
+        <% } %>
+        <form action="/registro" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+            <h2 style="text-align: center; color: #333;">Regístrate</h2>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" id="tnombre" name="tnombre" maxlength="50" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Nombre">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" id="tapellidos" name="tapellidos" maxlength="50" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Apellidos">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" id="tusuario" name="tusuario" maxlength="20" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Usuario">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" type="email" id="temail" name="temail" maxlength="50" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Correo electrónico">
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" type="telefono" id="telefono" name="telefono" maxlength="50" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="teléfono">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" type="password" id="tpassword" name="tpassword" maxlength="20" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Contraseña">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input class="input-control" type="password" id="tconfirmarpassword" name="tconfirmarpassword" maxlength="20" 
+                style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #e3f2fd;" 
+                required autocomplete="off" placeholder="Confirmar Contraseña">
+            </div>
+
+            <div style="display: flex; justify-content: space-between;">
+                <button class="boton" id="boton1" type="reset"
+                    onclick="document.getElementById('tnombre').focus();"
+                    style="flex: 1; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fa fa-trash"></i> Limpiar
+                </button>
+                <button class="boton" id="boton2" type="submit"
+                    style="flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                    <i class="fa fa-user-plus"></i> Registrarse
+                </button>
+            </div>
+
+            <div style="text-align: center; margin-top: 10px;">
+                <p style="margin: 0; color: #555;">¿Ya tienes cuenta?</p>
+                <a href="/login" style="color: #007bff; text-decoration: none;">Inicia sesión aquí</a>
+            </div>
+        </form>
+    </div>
+</section>

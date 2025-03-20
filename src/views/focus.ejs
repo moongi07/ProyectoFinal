@@ -1,0 +1,124 @@
+<section id="tasks" class="section active">
+    <div class="containerpomodoro">
+        <!-- Pomodoro Section -->
+        <div class="pomodoro-section">
+            <h2 class="text-center">Pomodoro Timer</h2>
+            <div class="text-center">
+                <div class="timer" id="timer">
+                    <span id="minutes">25</span>:<span id="seconds">00</span>
+                </div>
+                <div class="status" id="status">¡Comienza a trabajar!</div>
+                <button id="startButton" class="btn btn-success btn-pomodoro mt-3">Iniciar</button>
+                <button id="resetButton" class="btn btn-danger btn-pomodoro mt-3" style="display:none;">Reiniciar</button>
+            </div>
+        </div>
+
+        <!-- Task Manager Section -->
+        <div class="task-section mt-4">
+            <h2 class="text-center">Gestor de Tareas</h2>
+            <div class="input-group mb-3">
+                <input type="text" id="taskInput" class="form-control" placeholder="Añadir tarea..." aria-label="Añadir tarea">
+                <div class="input-group-append">
+                    <button id="addTaskButton" class="btn btn-primary">Añadir</button>
+                </div>
+            </div>
+            <ul id="taskList" class="task-list"></ul>
+        </div>
+    </div>
+</section>
+
+    <script>
+        
+        let timer;
+        let isRunning = false;
+        let minutes = 25;
+        let seconds = 0;
+        let isWorkTime = true;
+        
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const minutesDisplay = document.getElementById('minutes');
+        const secondsDisplay = document.getElementById('seconds');
+        const statusDisplay = document.getElementById('status');
+
+        const startTimer = () => {
+            timer = setInterval(() => {
+                if (seconds === 0) {
+                    if (minutes === 0) {
+                        clearInterval(timer);
+                        statusDisplay.innerText = isWorkTime ? "¡Es hora de descansar!" : "¡Es hora de trabajar!";
+                        isWorkTime = !isWorkTime;
+                        minutes = isWorkTime ? 25 : 5;
+                        seconds = 0;
+                        startButton.innerText = "Iniciar";
+                        resetButton.style.display = 'none';
+                    } else {
+                        minutes--;
+                        seconds = 59;
+                    }
+                } else {
+                    seconds--;
+                }
+
+                minutesDisplay.innerText = minutes < 10 ? '0' + minutes : minutes;
+                secondsDisplay.innerText = seconds < 10 ? '0' + seconds : seconds;
+            }, 1000);
+        };
+
+        startButton.addEventListener('click', () => {
+            if (!isRunning) {
+                startTimer();
+                isRunning = true;
+                startButton.innerText = "Pausar";
+                resetButton.style.display = 'inline-block';
+            } else {
+                clearInterval(timer);
+                isRunning = false;
+                startButton.innerText = "Reanudar";
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            clearInterval(timer);
+            minutes = 25;
+            seconds = 0;
+            minutesDisplay.innerText = '25';
+            secondsDisplay.innerText = '00';
+            statusDisplay.innerText = "¡Comienza a trabajar!";
+            startButton.innerText = "Iniciar";
+            resetButton.style.display = 'none';
+        });
+
+        // Task Manager
+        const taskInput = document.getElementById('taskInput');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const taskList = document.getElementById('taskList');
+
+        const addTask = () => {
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                const li = document.createElement('li');
+                li.classList.add('task-item');
+                li.innerHTML = `${taskText} <button class="remove-task-button btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>`;
+                taskList.appendChild(li);
+
+                li.querySelector('.remove-task-button').addEventListener('click', () => {
+                    li.remove();
+                });
+
+                li.addEventListener('click', () => {
+                    li.classList.toggle('completed');
+                });
+                taskInput.value = '';
+            }
+        };
+
+        addTaskButton.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
