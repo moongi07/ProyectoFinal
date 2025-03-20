@@ -3,10 +3,7 @@
     src: url('https://dl.dropbox.com/scl/fi/n3diu498n0h4d5o8ah1kf/Arsenica-Variable-Regular.ttf?rlkey=zcm0nipcic3wsne28xdpraez1&st=ub2mvyqz&') format('truetype');
 }
 
-
-  
 :root {
-  
   --fuentelogo: "arsenica";
   --fuente: "Literata", serif;
   --fuentesub: "Arial", sans-serif;
@@ -214,51 +211,6 @@ i {
   display: none;
 }
 
-/* menu responsive */
-@media only screen and (max-width:  699px) {
-  .menu {
-      margin-right: 0 !important;
-      text-align: center;
-      display: none;
-  }
-  .label {
-      display: block;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: crosshair;
-      border-left: var(--borde);
-      width: 40px;
-      height: 40px;
-  }
-  #toggle:checked + .menu {
-      display: block;
-      position: absolute;
-      left: 0;
-      right: 5px;
-      top: 41px;
-      background: var(--back);
-      padding: 10px;
-      border-bottom: var(--borde);
-  }
-
-  .contact-card {
-    flex: 1 1 100%;
-    margin-bottom: 20px;
-}
-
-.contact-header h1 {
-    font-size: 2.5rem;
-}
-
-.contact-header p {
-    font-size: 1rem;
-}
-
-.company-info p {
-    font-size: 1rem;
-}
-}
 
 img,
 svg,
@@ -329,11 +281,11 @@ i {
       }
       
       .custom-icon {
-        font-size: 25px; /* Tamaño del ícono */
-        padding: 3px; /* Espaciado interno */
+        font-size: 25px; 
+        padding: 3px; 
         margin-left: 5px;
-        border-radius: 10px; /* Bordes redondeados (opcional) */
-        color: #6f4e37; /* Color del ícono */
+        border-radius: 10px; 
+        color: #6f4e37; 
     }
 
     .menu-container {
@@ -490,26 +442,6 @@ i {
         background-color: #c0392b;
     }
 
-    .sound-section {
-        margin-top: 30px;
-        text-align: center;
-    }
-
-    .sound-button {
-        padding: 10px 20px;
-        background-color: #5a3e36;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        margin: 5px;
-    }
-
-    .sound-button:hover {
-        background-color: #7a6e65;
-    }
-
     .logros-carousel-container {
         position: relative;
         width: 80%;
@@ -615,7 +547,6 @@ i {
       color: #333;
   }
 
-  /* Diseño en cuadrícula */
   .achievements-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -624,7 +555,6 @@ i {
       justify-content: center;
   }
 
-  /* Tarjeta de logro */
   .achievement-card {
       background: white;
       border-radius: 15px;
@@ -638,7 +568,6 @@ i {
       transform: scale(1.05);
   }
 
-  /* Imagen de logro */
   .achievement-img {
       width: 80px;
       height: 80px;
@@ -646,7 +575,6 @@ i {
       margin-bottom: 10px;
   }
 
-  /* Contenido del logro */
   .achievement-title {
       font-size: 1.4rem;
       font-weight: bold;
@@ -670,7 +598,6 @@ i {
     cursor: pointer;
 }
 
-/* Container principal */
 #tasks {
     display: flex;
     flex-direction: column;
@@ -680,7 +607,7 @@ i {
 }
 
 
-  /* Tasks List Style */
+
   #tasks {
     padding: 1.5rem 2rem;
   }
@@ -739,7 +666,6 @@ i {
     font-size: 1.25rem;
   }
   
-  /* Animations */
   @keyframes fadeIn {
     0% {
       opacity: 0;
@@ -936,7 +862,7 @@ i {
   text-decoration: underline;
 }
 
-/* Mapa */
+
 .map-container {
   margin-top: 3rem;
   text-align: center;
@@ -947,7 +873,7 @@ i {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Iconos de redes sociales */
+
 .social-icons {
   display: flex;
   justify-content: center;
@@ -965,7 +891,7 @@ i {
   color: #007bff;
 }
 
-/* Transiciones para iconos */
+
 .social-icons i {
   transition: transform 0.3s ease;
 }
@@ -974,10 +900,50 @@ i {
   transform: scale(1.2);
 }
   
-  @media (max-width: 1000px)
-  {
-    
-  
+ /*TAMAÑO MOVIL*/
+@media only screen and (max-width:  699px) {
+  .menu {
+      margin-right: 0 !important;
+      text-align: center;
+      display: none;
+  }
+  .label {
+      display: block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: crosshair;
+      border-left: var(--borde);
+      width: 40px;
+      height: 40px;
+  }
+  #toggle:checked + .menu {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 5px;
+      top: 41px;
+      background: var(--back);
+      padding: 10px;
+      border-bottom: var(--borde);
+  }
+
+  .contact-card {
+    flex: 1 1 100%;
+    margin-bottom: 20px;
+}
+
+.contact-header h1 {
+    font-size: 2.5rem;
+}
+
+.contact-header p {
+    font-size: 1rem;
+}
+
+.company-info p {
+    font-size: 1rem;
+}
 .navbar-nav {
   display: flex;
   justify-content: flex-end; 
@@ -1017,5 +983,4 @@ i {
 .carousel {
   touch-action: pan-y; 
 }
-
 }

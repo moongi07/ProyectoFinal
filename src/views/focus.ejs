@@ -1,6 +1,6 @@
 <section id="tasks" class="section active">
     <div class="containerpomodoro">
-        <!-- Pomodoro Section -->
+        <!-- POMODORO -->
         <div class="pomodoro-section">
             <h2 class="text-center">Pomodoro Timer</h2>
             <div class="text-center">
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <!-- Task Manager Section -->
+        <!-- TAREAS -->
         <div class="task-section mt-4">
             <h2 class="text-center">Gestor de Tareas</h2>
             <div class="input-group mb-3">
@@ -28,19 +28,21 @@
 </section>
 
     <script>
-        
+        //VARIABLES
         let timer;
         let isRunning = false;
         let minutes = 25;
         let seconds = 0;
         let isWorkTime = true;
-        
         const startButton = document.getElementById('startButton');
         const resetButton = document.getElementById('resetButton');
         const minutesDisplay = document.getElementById('minutes');
         const secondsDisplay = document.getElementById('seconds');
+        //variable de mensaje de pomodoro
         const statusDisplay = document.getElementById('status');
 
+        //el pomodoro consiste en 25 min de trabajo y 5 de descanso, cuando esos 25 min se acaben, pasará a poner ¡es hora de descansar!
+        //y la cuenta de atrás de 5 min
         const startTimer = () => {
             timer = setInterval(() => {
                 if (seconds === 0) {
@@ -67,11 +69,14 @@
 
         startButton.addEventListener('click', () => {
             if (!isRunning) {
+                //iniciamos el temporizador
                 startTimer();
                 isRunning = true;
+                //cambiar texto a pausar
                 startButton.innerText = "Pausar";
                 resetButton.style.display = 'inline-block';
             } else {
+                //si ya ha empezado entonces el botón será reanudar y reanudará el temporizador
                 clearInterval(timer);
                 isRunning = false;
                 startButton.innerText = "Reanudar";
@@ -79,6 +84,7 @@
         });
 
         resetButton.addEventListener('click', () => {
+            //reinicia todas las variables
             clearInterval(timer);
             minutes = 25;
             seconds = 0;
@@ -89,23 +95,28 @@
             resetButton.style.display = 'none';
         });
 
-        // Task Manager
+        //variables del gestor de tareas
         const taskInput = document.getElementById('taskInput');
         const addTaskButton = document.getElementById('addTaskButton');
         const taskList = document.getElementById('taskList');
 
+
         const addTask = () => {
+            //eliminar espacios en blanco
             const taskText = taskInput.value.trim();
             if (taskText) {
+                //creamos elemento li
                 const li = document.createElement('li');
+                //le ponemos la clase task-item
                 li.classList.add('task-item');
+                //metemos el boton borrar
                 li.innerHTML = `${taskText} <button class="remove-task-button btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>`;
                 taskList.appendChild(li);
-
+                //le metemos la funcionalidad de borrar al boton borrar
                 li.querySelector('.remove-task-button').addEventListener('click', () => {
                     li.remove();
                 });
-
+                //si clickas encima de la tarea se marca como completada
                 li.addEventListener('click', () => {
                     li.classList.toggle('completed');
                 });
@@ -114,6 +125,7 @@
         };
 
         addTaskButton.addEventListener('click', addTask);
+        //para poder tambien añadir tareas al clickar enter
         taskInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 addTask();

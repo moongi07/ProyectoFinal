@@ -23,9 +23,10 @@ async function agregarAlCarrito(productoId) {
             headers: {
                 'Content-Type': 'application/json'
             },
+             //pasamos el id del producto como json
             body: JSON.stringify({ producto_id: productoId })
         });
-
+        // esperamos la respuesta del servidor
         const data = await response.json();
 
        

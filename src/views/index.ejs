@@ -56,7 +56,7 @@ function cargarAnimaciones() {
     });
 }
 
-// Llamar a la función para cargar las animaciones
+//cargamos las anumaciones
 cargarAnimaciones();
 
 function setupCarousel(trackSelector, nextButtonSelector, prevButtonSelector) {
@@ -71,7 +71,7 @@ function setupCarousel(trackSelector, nextButtonSelector, prevButtonSelector) {
         track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
     }
 
-    // Botones de navegación
+    //botones de los lados
     nextButton.addEventListener('click', () => {
         if (currentIndex < slides.length - 1) {
             currentIndex++;
@@ -90,7 +90,7 @@ function setupCarousel(trackSelector, nextButtonSelector, prevButtonSelector) {
         updateSlidePosition();
     });
 
-    // Manejadores de eventos para el deslizado en móvil
+    //para que en el movil se pueda deslizar
     let startX;
     track.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;

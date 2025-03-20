@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+//encriptar contraseñas
 const bcrypt = require('bcryptjs');
+//generar pdf
 const PDFDocument = require('pdfkit');
+//enviar correo
 const nodemailer = require('nodemailer');
+//para generar id unicos
 const { v4: uuidv4 } = require("uuid");
 
 
-// usuarios
+
 const dbConnection = require('../config/dbConnection');
 // realizamos una conexión a la base de datos
 const connection = dbConnection();
@@ -38,7 +42,7 @@ router.get('/login', (req, res) => {
 
 //*********************************************************
 //*********************************************************
-//             controlador: LOGIN request tipo->(POST "/LOGIN")
+//        controlador: LOGIN request tipo->(POST "/LOGIN")
 //				vista: 'login' -> 
 //*********************************************************
 //*********************************************************
@@ -56,9 +60,10 @@ router.post('/login', (req, res) => {
         if (results.length > 0) {
             const user = results[0];
             
-            // Comparar la contraseña ingresada con la encriptada en la base de datos
+            // comparar la contraseña ingresada con la encriptada en la base de datos
             const passwordMatch = await bcrypt.compare(tpassword, user.password);
             
+            //variables de sesion
             if (passwordMatch) {
                 req.session.userId = user.id;
                 req.session.user = user;
@@ -92,16 +97,16 @@ router.get('/registro', (req, res) => {
 router.post('/registro', async(req, res) =>
     {
 
-        console.log('inicio registro');
-    
-        if (req.method === "POST") {
+        //console.log('inicio registro');
+      
+            //cogemos los datos del body
             const { tnombre, tapellidos, tusuario, temail,telefono, tpassword, tconfirmarpassword } = req.body;
-            
+              //confirmar que ambas contraseñas coincidan
             if (tpassword !== tconfirmarpassword) {
                 return res.render('registro', { mensaje: "Las contraseñas no coinciden." });
             }
-    
             try {
+              //la encriptamos
                 const hashedPassword = await bcrypt.hash(tpassword, 10); 
                 
                 // Creación del objeto usuario
@@ -113,7 +118,7 @@ router.post('/registro', async(req, res) =>
                     telefono: telefono,
                     password: hashedPassword,
                 };
-                console.log("Datos a insertar:", user);
+                //console.log("Datos a insertar:", user);
     
                 // Insertar en la base de datos
                 connection.query('INSERT INTO user SET ?', user, (err, result) => {
@@ -128,11 +133,10 @@ router.post('/registro', async(req, res) =>
                 console.error("Error en el proceso de registro:", error);
                 res.render('registro', { mensaje: "Error interno del servidor." });
             }
-        } else {
-            console.log('No se ha recibido el formulario correctamente');
-        }
+        
     });
 
+    //vista de error, al final no la usamos
 router.get('/error', (req, res) => {
     
     res.render('error', { errorMessage: req.session.error });
@@ -143,7 +147,7 @@ router.get('/error', (req, res) => {
 
 //*********************************************************
 //*********************************************************
-//             controlador: MENU request tipo->(GET "/menu")
+//         controlador: MENU request tipo->(GET "/menu")
 //				vista: 'menu' -> 
 //*********************************************************
 //*********************************************************
@@ -156,29 +160,37 @@ router.get('/menu', (req, res) => {
           return res.status(500).send("Error al obtener los productos");
       }
 
+      //metemos los datos en un map
       let productos = results.map(producto => ({
           id: producto.producto_id,
           nombre: producto.nombre,
           precio: producto.precio,
           descripcion: producto.descripcion
       }));
-
-      res.render('menu', { productos }); // Asegurar que se pasan los productos a la vista
+      //mandamos los productos
+      res.render('menu', { productos }); 
   });
 });
-
+//*********************************************************
+//*********************************************************
+//         controlador: MASCARRITO request tipo->(POST "/mascarrito")
+//				vista: 'carrito' -> 
+//*********************************************************
+//*********************************************************
 router.post('/mascarrito', (req, res) => {
+  //nos aseguramos de que haya iniciado sesión, si no se le redirige al login
   if (!req.session.user) {
     console.log("Usuario no autenticado. Redirigiendo a /login");
     return res.redirect('/login'); 
   }
-
+  //cogemos el id del productop
   const productoId = req.body.producto_id;
 
+  //nos aseguramos de que sea valido
   if (!productoId || isNaN(productoId)) {
       return res.status(400).json({ mensaje: 'No se ha seleccionado un producto válido' });
   }
-
+//cogemos los datos del producto
   const sql = 'SELECT * FROM producto WHERE producto_id = ?';
 
   connection.query(sql, [productoId], (err, results) => {
@@ -186,19 +198,21 @@ router.post('/mascarrito', (req, res) => {
           console.error('❌ Error al obtener el producto:', err);
           return res.status(500).json({ mensaje: 'Error al añadir el producto al carrito' });
       }
-
+      //si existe lo guardamos en producto
       if (results.length > 0) {
           const producto = results[0];
-
+        //si no existe la variable de sesion con los productos del carrito la creamos, es decir, en el caso de que 
+        //sea el primero producto que añadimos al carrito
           if (!req.session.productos) {
               req.session.productos = [];
           }
-
+          //si ya existe añadimos 1 a la cantidad
           const productoExistente = req.session.productos.find(p => p.producto_id === producto.producto_id);
 
           if (productoExistente) {
               productoExistente.cantidad += 1;
           } else {
+            //si no existe todavia lo metemos en la variable de sesion con 1 como cantidad
               req.session.productos.push({
                   producto_id: producto.producto_id,
                   nombre: producto.nombre,
@@ -222,9 +236,8 @@ router.post('/mascarrito', (req, res) => {
 //				vista: 'carrito' -> 
 //*********************************************************
 //*********************************************************
-
 router.get('/carrito', (req, res) => {
-    
+    //si hay algo en el carrito los mostramos, si no mandamos el mensaje que el carrito está vacío
     if (req.session.productos && req.session.productos.length > 0) {
         res.render('carrito', { productos: req.session.productos });
     } else {
@@ -239,12 +252,12 @@ router.get('/carrito', (req, res) => {
 //				vista: 'carrito' -> 
 //*********************************************************
 //*********************************************************
-
 router.post('/eliminarproducto', (req, res) => {
+    //cogemos el id del producto
     const { producto_id } = req.body;
-
+    //cogemos el indice del producto en la variable de sesion
     const index = req.session.productos.findIndex(p => String(p.producto_id) === String(producto_id));
-
+  //si existe lo quitamos y redirigimos al carrito
     if (index > -1) {
         req.session.productos.splice(index, 1);
         res.redirect('/carrito');
@@ -253,38 +266,40 @@ router.post('/eliminarproducto', (req, res) => {
     }
 });
 
-
-
-
-
+//*********************************************************
+//*********************************************************
+//             controlador: GRACIAS
+//          request tipo->(GET "/gracias")
+//				vista: 'gracias' -> 
+//*********************************************************
+//*********************************************************
 router.get('/gracias', (req, res) => {
-    
+//vista a la que redirigimos cuando el usuario haya efectuado la compra y se le haya mandado el correo con la factura
    res.render('gracias');
 });
+
 //*********************************************************
 //*********************************************************
-//             controlador: GENERAR PDF
-//          request tipo->(GET "/pago")
+//        controlador: GENERAR PDF Y MANDAR CORREO
+//        request tipo->(GET "/pago")
 //				vista: 'carrito' -> 
 //*********************************************************
 //*********************************************************
-
-
 router.get("/pago", async (req, res) => {
-    // Modificar la configuración del transporter para incluir opciones adicionales y manejar mejor las credenciales
+    //configuracion para mandar el email, las variables están en el .env
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER || "tu_correo@gmail.com", // Asegúrate de reemplazar esto con tu correo real
-        pass: process.env.EMAIL_PASS || "tu_contraseña_de_aplicación", // Asegúrate de reemplazar esto con tu contraseña real
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS 
       },
       secure: true, // Usar SSL
       tls: {
-        rejectUnauthorized: false, // Ayuda con algunos problemas de certificados
+        rejectUnauthorized: false, // ayuda con algunos problemas de certificados
       },
     })
   
-    // Añadir verificación de conexión
+    // Verificamos la conexion, esto ya no haría falta, eran pruebas para solucionar errores
     transporter.verify((error, success) => {
       if (error) {
         console.log("Error de configuración del servidor de correo:", error)
@@ -293,41 +308,41 @@ router.get("/pago", async (req, res) => {
       }
     })
   
+    //si el usuario no ha iniciado sesion mandamos el error
     if (!req.session.user) {
       return res.status(401).json({ error: "Usuario no autenticado" })
     }
-  
+    //cogemos las variables de sesion del id del usuario, los productos del carrito y el email del usuario
     const productos = req.session.productos || []
     const id_usuario = req.session.user.id
-    const userEmail = req.session.user.email || req.query.email
+    const userEmail = req.session.user.email 
   
-    // Crear un nombre de archivo único para el PDF temporal
+    //nombre de factura y ruta
+    //almacenamos el pdf temporalmente para poder enviarlo
     const tempFileName = `factura_${uuidv4()}.pdf`
     const tempFilePath = path.join(__dirname, "..", "temp", tempFileName)
-  
-    // Asegurarse de que el directorio temp existe
     const tempDir = path.join(__dirname, "..", "temp")
+    //si no existe creamos el directorio
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true })
     }
   
-    // Crear el PDF y guardarlo en un archivo temporal
+    //crear pdf
     const doc = new PDFDocument({
       margin: 50,
       size: "A4",
       bufferPages: true,
     })
   
-    // Guardar el PDF en un archivo temporal
+    //lo guardamos como fichero temporal
     const writeStream = fs.createWriteStream(tempFilePath)
     doc.pipe(writeStream)
   
-    // Colores básicos
     const primaryColor = "#4F2C1D"
     const accentColor = "#D4B996"
   
-    // Header y logo
-    const logoPath = path.join(__dirname, "..", "public", "imagenes", "logo.png")
+    //header y logo, si no encuentra el logo ponemos simplemente la palabrá café
+    const logoPath = path.join(__dirname, "..", "public", "assets", "logo.png")
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, 50, 45, { width: 100 })
     } else {
@@ -335,24 +350,25 @@ router.get("/pago", async (req, res) => {
       doc.fillColor(primaryColor).fontSize(20).text("CAFÉ", 75, 60)
     }
   
-    // Información de la tienda
+    //información inventada de la tienda
     doc.font("Helvetica-Bold").fontSize(18).fillColor(primaryColor).text("Café Aroma", 200, 50, { align: "right" })
     doc
       .font("Helvetica")
       .fontSize(10)
       .fillColor(primaryColor)
       .text("Calle del Café, 123", 200, 70, { align: "right" })
-      .text("28001 Madrid, España", 200, 85, { align: "right" })
+      .text("02006 Albacete, España", 200, 85, { align: "right" })
       .text("Tel: +34 91 123 45 67", 200, 100, { align: "right" })
       .text("info@cafearoma.com", 200, 115, { align: "right" })
   
-    // Línea separadora
+    //linea
     doc.moveTo(50, 140).lineTo(550, 140).strokeColor(accentColor).lineWidth(2).stroke()
   
-    // Título y fecha
+    //titulo y fecha
     doc.font("Helvetica-Bold").fontSize(24).fillColor(primaryColor).text("FACTURA", 50, 170)
   
     const today = new Date()
+    //también ponemos el id del cliente y su nombre. Si no lo encuentra ponemos solo cliente
     doc
       .font("Helvetica")
       .fontSize(10)
@@ -361,7 +377,7 @@ router.get("/pago", async (req, res) => {
       .text(`Cliente: ${req.session.user.nombre || "Cliente"}`, 50, 215)
       .text(`ID Cliente: ${id_usuario}`, 50, 230)
   
-    // Código de factura
+    // código de factura
     const invoiceNumber = `INV-${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, "0")}${today.getDate().toString().padStart(2, "0")}-${Math.floor(
       Math.random() * 1000,
     )
@@ -373,7 +389,8 @@ router.get("/pago", async (req, res) => {
       .fillColor(primaryColor)
       .text(`Nº Factura: ${invoiceNumber}`, 300, 200, { align: "right" })
   
-    // Tabla de productos
+    //listamos los productos en una tabla
+    //header de tabla
     doc.rect(50, 260, 500, 30).fill(primaryColor)
     doc
       .fillColor("white")
@@ -385,7 +402,7 @@ router.get("/pago", async (req, res) => {
   
     let y = 300
     let isEvenRow = false
-  
+    //productos
     for (const producto of productos) {
       if (isEvenRow) {
         doc.rect(50, y - 10, 500, 30).fill("#F5F5F5")
@@ -398,7 +415,7 @@ router.get("/pago", async (req, res) => {
         .text(producto.nombre, 100, y, { width: 240 })
         .text(`${producto.precio.toFixed(2)}€`, 350, y, { width: 70, align: "right" })
         .text(`${producto.cantidad}`, 420, y, { width: 70, align: "right" })
-  
+      //calculamos el precio por la cantidad
       const lineTotal = producto.precio * producto.cantidad
       doc
         .fillColor(primaryColor)
@@ -406,7 +423,7 @@ router.get("/pago", async (req, res) => {
         .text(`${lineTotal.toFixed(2)}€`, 490, y, { width: 60, align: "right" })
   
       y += 30
-  
+      //añadimos otra página si se pasa de espacio
       if (y > 700) {
         doc.addPage()
         y = 50
@@ -415,11 +432,11 @@ router.get("/pago", async (req, res) => {
       }
     }
   
-    // Totales
+    //total y total con el IVA
     const subtotal = productos.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0)
     const tax = subtotal * 0.21
     const total = subtotal + tax
-  
+    
     doc.moveTo(50, y).lineTo(550, y).strokeColor(accentColor).lineWidth(1).stroke()
     y += 20
   
@@ -444,7 +461,7 @@ router.get("/pago", async (req, res) => {
       .text("TOTAL:", 350, y, { width: 100, align: "right" })
       .text(`${total.toFixed(2)}€`, 490, y, { width: 60, align: "right" })
   
-    // Footer
+    //footer, ponemos también el número de página
     const pageCount = doc.bufferedPageCount
     for (let i = 0; i < pageCount; i++) {
       doc.switchToPage(i)
@@ -463,7 +480,7 @@ router.get("/pago", async (req, res) => {
   
     doc.end()
   
-    // Esperar a que el archivo se escriba completamente
+    //nos aseguramos de que el fichero se haya terminado de escribir correctamente
     await new Promise((resolve, reject) => {
       writeStream.on("finish", resolve)
       writeStream.on("error", reject)
@@ -471,26 +488,25 @@ router.get("/pago", async (req, res) => {
   
     try {
       for (const producto of productos) {
-        // Asegurarse de que sea un número entero
         const productoId = Number.parseInt(producto.producto_id, 10)
   
-        console.log(`Procesando producto: ${producto.nombre} (ID: ${productoId}), Cantidad: ${producto.cantidad}`)
+        //console.log(`Procesando producto: ${producto.nombre} (ID: ${productoId}), Cantidad: ${producto.cantidad}`)
   
-        // Insertar el pedido
+        //insertamos el pedido en la bbdd
         const sqlInsert = "INSERT INTO pedido (id_usuario, producto_id, fecha, cantidad) VALUES (?, ?, NOW(), ?)"
         await connection.query(sqlInsert, [id_usuario, productoId, producto.cantidad])
   
-        console.log(`Pedido insertado para producto ${productoId}`)
+        //console.log(`Pedido insertado para producto ${productoId}`)
       }
   
-      // Limpiar el carrito
+      //vaciamos el carrito
       req.session.productos = []
-      console.log("Carrito procesado correctamente")
+      //console.log("Carrito procesado correctamente")
   
-      // Enviar correo con el PDF adjunto si hay una dirección de correo
+      //enviamos el email con el pdf adjunto
       if (userEmail) {
         const mailOptions = {
-          from: process.env.EMAIL_USER || "andreamartinezmoreno8@gmail.com",
+          from: process.env.EMAIL_USER,
           to: userEmail,
           subject: `Aquí tiene el pdf de su pedido ` + req.session.user.username,
           text: `Estimado/a ${req.session.user.nombre || "Cliente"},
@@ -505,40 +521,40 @@ router.get("/pago", async (req, res) => {
           attachments: [
             {
               filename: "factura_cafe.pdf",
-              path: tempFilePath, // Usar el archivo temporal
+              path: tempFilePath, // archivo temporal
             },
           ],
         }
   
-        // Enviar correo con el adjunto
+        //envia correo
         await transporter.sendMail(mailOptions)
-        console.log("Correo enviado correctamente")
+        //console.log("Correo enviado correctamente")
       }
   
-      // Si quieres también enviar el PDF como respuesta HTTP
+      //por si también queremos mandarlo por http para que se descargue automáticamente
       if (req.query.download === "true") {
         res.setHeader("Content-Type", "application/pdf")
         res.setHeader("Content-Disposition", 'attachment; filename="factura_cafe.pdf"')
         res.sendFile(tempFilePath)
       } else {
-        // Limpiar el archivo temporal después de un tiempo
+        //eliminamos el archivo temporal
         setTimeout(() => {
           try {
             if (fs.existsSync(tempFilePath)) {
               fs.unlinkSync(tempFilePath)
-              console.log(`Archivo temporal ${tempFilePath} eliminado`)
+              //console.log(`Archivo temporal ${tempFilePath} eliminado`)
             }
           } catch (err) {
             console.error("Error al eliminar archivo temporal:", err)
           }
-        }, 60000) // Eliminar después de 1 minuto
-  
+        }, 60000) // eliminar después de 1 minuto para asegurarnos de que todo haya terminado
+        //redirigimos a la vista gracias
         res.redirect("/gracias")
       }
     } catch (error) {
       console.error("Error procesando pedido:", error)
   
-      // Limpiar el archivo temporal en caso de error
+      // en caso de error eliminamos el archivo temporal
       try {
         if (fs.existsSync(tempFilePath)) {
           fs.unlinkSync(tempFilePath)
@@ -549,22 +565,27 @@ router.get("/pago", async (req, res) => {
   
       res.status(500).json({ error: "Error procesando el pedido" })
     }
+     //Aquí deberiamos contar la cantidad de productos que ha consumido el usuario de cada uno de ellos
+     //Comparar la cantidad con la de los logros de la tabla tiene
+     //En el caso de que alguna de las cantidades coincidan o sean mayores esta se almacenará en la tabla obtiene
+     //de esa tabla es de la que se hará el listado en logros
+     //No he podido terminar esa funcionalidad porque interrumpía la creación del pdf y correo, la haré más adelante
   });
 
-    //*********************************************************
+ 
+
 //*********************************************************
-//             controlador: LOGROS request tipo->(GET "/logros")
+//*********************************************************
+//         controlador: LOGROS request tipo->(GET "/logros")
 //				vista: 'logros' -> 
 //*********************************************************
 //*********************************************************
-
 router.get('/logros', (req, res) => {
-  // Verificar si el usuario está autenticado
   if (!req.session.user) {
       return res.redirect('/login');  
   }
 
-  // Consulta SQL para obtener logros
+  //en vez de listar los logros concretos del usuario de la tabla obtiene solo listamos los logros en general
   const sql = `SELECT id, nombre, recompensa, descripcion FROM logro`;
 
   connection.query(sql, (err, results) => {
@@ -573,7 +594,7 @@ router.get('/logros', (req, res) => {
           return res.status(500).send("Error al obtener los logros");
       }
 
-      // Convertir los datos en un array de objetos
+      //los metemos en un map y los mandamos a la vista logros
       const logros = results.map(row => ({
           id: row.id,
           nombre: row.nombre,
@@ -581,7 +602,6 @@ router.get('/logros', (req, res) => {
           descripcion: row.descripcion
       }));
 
-      // Renderizar la vista con los logros obtenidos
       res.render('logros', { logros });
   });
 });
@@ -590,7 +610,7 @@ router.get('/logros', (req, res) => {
 
 //*********************************************************
 //*********************************************************
-//             controlador: USER request tipo->(GET "/user")
+//         controlador: USER request tipo->(GET "/user")
 //				vista: 'user' -> 
 //*********************************************************
 //*********************************************************
@@ -599,7 +619,7 @@ router.get('/user',(req,res)=>
     if (!req.session.user) {
         res.redirect('/login');
     }
-    //de momento cogemos un usuario en concreto. Más adelante cuando haga el login usaremos las variables de sesión
+  //cogemos los datos del usuario una vez nos hemos asegurado de que ha iniciado sesión y los mandamos a la vista user
 	let sql = "SELECT id, username, nombre, apellidos, email, telefono FROM user WHERE id = ?";
 
 
@@ -608,9 +628,9 @@ router.get('/user',(req,res)=>
                 console.log("algo ha salido mal"+ err)
             }
 
-            if (results.length > 0 )
+      if (results.length > 0 )
 			{
-                let id = results[0].id;
+        let id = results[0].id;
 				let username= results[0].username;
 				let nombre= results[0].nombre;
 				let apellidos= results[0].apellidos;
@@ -619,28 +639,27 @@ router.get('/user',(req,res)=>
 				res.render('user', {id, username, nombre, apellidos, email, telefono});
 			}
 		});
-	
-
 });
 
 //*********************************************************
 //*********************************************************
-//             controlador: EDITAR request tipo->(GET "/editar")
+//        controlador: EDITAR request tipo->(GET "/editar")
 //				vista: 'editar' -> 
 //*********************************************************
 //*********************************************************	
 router.get('/editar/:id', (req, res) => {
+    //cogemos el id del usuario
     const userId = req.params.id;
 
-
-
-
-    // Verificar si el usuario tiene permiso para editar su propio perfil
+    //si el usuario no coincide con el de la variable de sesión destruimos la sesion y lo volvemos a mandar al login
     if (req.session.userId != userId) {
-        return res.status(403).send("No tienes permiso para editar este perfil.");
+      req.session.destroy(function(err)
+			{
+				res.redirect("/");
+			});
     }
 
-    // Obtener los datos del usuario desde la base de datos
+    //obtenemos los datos del usuario de la base de datos para mandarlos a editar y que el usuario puea modificarlos
     const sql = 'SELECT nombre, apellidos, username, email, telefono FROM user WHERE id = ?';
     
     connection.query(sql, [userId], (err, results) => {
@@ -653,7 +672,7 @@ router.get('/editar/:id', (req, res) => {
             return res.status(404).send("Usuario no encontrado");
         }
 
-        // Enviar los datos del usuario al formulario de edición
+        //mandamos los datos
         const user = results[0];
         res.render('editar', {
             nombre: user.nombre,
@@ -669,20 +688,23 @@ router.get('/editar/:id', (req, res) => {
 
 //*********************************************************
 //*********************************************************
-//             controlador: EDITAR request tipo->(POST "/editar")
+//         controlador: EDITAR request tipo->(POST "/editar")
 //				vista: 'editar' -> 
 //*********************************************************
 //*********************************************************	
 router.post('/editar', (req, res) => {
-    // Cogemos los datos del formulario
+    //cogemos los datos del formulario y hacemos el update
     const { nombre, apellidos, username, email, telefono, id } = req.body; 
 
-    // Verificar que el usuario en sesión es el que está intentando editar sus datos
+    //verificamos otra vez que la variable de sesion del id del usuario coincide con el id pasado
     if (req.session.userId != id) {
-        return res.status(403).send("No tienes permiso para editar este perfil.");
+      req.session.destroy(function(err)
+			{
+				res.redirect("/");
+			});
     }
 
-    // Actualizamos los datos del usuario por id
+    //hacemos el update de los datos del usuario
     const sql = `UPDATE user
                  SET nombre = ?, apellidos = ?, username = ?, email = ?, telefono = ? 
                  WHERE id = ?`;
@@ -693,22 +715,22 @@ router.post('/editar', (req, res) => {
             return res.status(500).send("Error al actualizar el usuario");
         }
         
-        // Actualizamos las variables de sesión con los nuevos datos
+        //actualizamos las variables de sesion con los nuevos datos
         req.session.user.nombre = nombre;
         req.session.user.apellidos = apellidos;
         req.session.user.username = username;
         req.session.user.email = email;
         req.session.user.telefono = telefono;
 
-        // Guardamos la sesión
+        //guardamos la sesión
         req.session.save(err => {
             if (err) {
                 console.error('❌ Error al guardar la sesión:', err);
                 return res.status(500).send("Error al actualizar la sesión.");
             }
 
-            console.log('✅ Usuario actualizado correctamente:', result);
-            // Redirigir a la página de usuario o donde desees
+            //console.log('✅ Usuario actualizado correctamente:', result);
+            //redirigimos a la vista user
             res.redirect('/user');  
         });
     });
@@ -717,35 +739,37 @@ router.post('/editar', (req, res) => {
 
 //*********************************************************
 //*********************************************************
-//             controlador: FOCUS request tipo->(GET "/focus")
+//         controlador: FOCUS request tipo->(GET "/focus")
 //				vista: 'focus' -> 
 //*********************************************************
 //*********************************************************
 router.get('/focus',(req,res)=>
 	{
-        //la idea sería almacenar las tareas del usuario en variables de sesión de momento
+  //en un futuro se almacenarán las tareas en variables de sesión, de momento solo tiene funcionalidades
+  //sencillas de tareas y pomodoro en cliente
 	res.render('focus');
 	});
 
 //*********************************************************
 //*********************************************************
-//             controlador: CONTACTO request tipo->(GET "/contacto")
+//         controlador: CONTACTO request tipo->(GET "/contacto")
 //				vista: 'contacto' -> 
 //*********************************************************
 //*********************************************************
 
 router.get('/contacto',(req,res)=>
 	{
-
-        //relleno
 	res.render('contacto');
 	});
 
 
 
-	
-//para cuando añada login y registro, de momento no hace falta
-
+//*********************************************************
+//*********************************************************
+//         controlador: LOGOUT request tipo->(GET "/logout")
+//				  vista: 'user' -> mandamos a vista /login
+//*********************************************************
+//*********************************************************
 router.get('/logout', (req, res) =>
 	{
 			// cerramos la sesión
