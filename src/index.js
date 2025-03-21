@@ -103,7 +103,7 @@ app.use(express.static(path.join(__dirname,'public')));
 //******************************************************************
 app.use(fileUpload());
 
-app.use(require('./src/routes/las_rutas'));
+app.use(require('./routes/las_rutas'));
 
 
 //******************************************************************
